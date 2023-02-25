@@ -1,0 +1,43 @@
+#!/bin/bash
+
+IF_WG=wgX
+IP_WG=x.x.x.x
+CIDR_WG=24
+
+function start
+{
+	ip link add $IF_WG type wireguard
+	wg setconf $IF_WG /etc/wireguard/$IF_WG.conf
+	ip link set $IF_WG up
+	ip addr add $IP_WG/$CIDR_WG dev $IF_WG
+}
+
+function stop
+{
+	ip link del $IF_WG
+}
+
+
+case "$1" in
+	start)
+		echo "Starting wg"
+		start
+		;;
+	stop)
+		echo "Stopping wg"
+		stop
+		;;
+	restart)
+		echo "Restarting wg"
+		stop
+		start
+		;;
+	"")
+		echo "Input argument required!"
+		exit 1
+		;;
+	*)
+		echo "Input argument $1 not recognized."
+		exit 1
+		;;
+esac
